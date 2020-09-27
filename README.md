@@ -1,1 +1,1 @@
-# spring-react-web-app
+# Spring ve React ile Web Uygulamasi Gelistirmek
