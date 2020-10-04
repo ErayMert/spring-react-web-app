@@ -8,16 +8,18 @@ class UserSignupPage extends React.Component{
         displayName : null,
         password : null,
         passwordRepeat : null,
-        pendingApiCall:false
+        pendingApiCall:false,
+        errors: {}
     };
 
     onChange = event =>{
         const {name, value} = event.target;
-
-        // const value = event.target.value;
-        // const name = event.target.name;
+        const errors = { ... this.state.errors };
+        errors[name] = undefined;
+        
         this.setState({
-            [name] : value
+            [name] : value,
+            errors
         });
     };
 
@@ -37,57 +39,21 @@ class UserSignupPage extends React.Component{
 //böylece signUp butonu tekrar aktif hale gelir.
 // axios asenkron olarak çalışır.
 
-        
-
-        // signup(body)
-        //     .then(response =>{
-        //         this.setState({pendingApiCall:false});
-        //     })
-        //     .catch(error =>{
-        //         this.setState({pendingApiCall:false});
-        //     });
-
         try{
             const response = await signup(body);
-            this.setState({pendingApiCall:false});
-        }catch{
+        }catch(error){
+            if(error.response.data.validationErrors){
+            this.setState({errors : error.response.data.validationErrors});
+            }
         }
         this.setState({pendingApiCall:false});
 
     };
 
-   
-
-    // onChangeUserName = event => {
-
-    //     this.setState({
-    //         username: event.target.value
-    //     });
-    // };
-
-    // onChangeDisplayName = event => {
-
-    //     this.setState({
-    //         displayName: event.target.value
-    //     });
-    // };
-
-    // onChangePassword = event => {
-
-    //     this.setState({
-    //         password: event.target.value
-    //     });
-    // };
-
-    // onChangePasswordRepeat = event => {
-
-    //     this.setState({
-    //         passwordRepeat: event.target.value
-    //     });
-    // };
-
     render(){
-        const {pendingApiCall} = this.state;
+        const {pendingApiCall, errors} = this.state;
+        const {usernameError} = errors;
+        
         return(
             <div className="container">
                 <div className="row">
@@ -96,7 +62,8 @@ class UserSignupPage extends React.Component{
                             <h1 className="text-center">Sign Up</h1>
                             <div className="form-group">
                                 <label>Username: </label>
-                                <input className="form-control" name="username" onChange = {this.onChange}/>
+                                <input className={usernameError ? "form-control is-invalid": "form-control"} name="username" onChange = {this.onChange}/>
+                                <div className="invalid-feedback">{usernameError}</div>
                             </div>
                             <div className="form-group">
                                 <label>Displaye Name: </label>
