@@ -1,5 +1,6 @@
 import React from 'react';
 import {signup} from '../api/apiCalls';
+import Input from '../components/input';
 
 class UserSignupPage extends React.Component{
 
@@ -43,7 +44,7 @@ class UserSignupPage extends React.Component{
             const response = await signup(body);
         }catch(error){
             if(error.response.data.validationErrors){
-            this.setState({errors : error.response.data.validationErrors});
+                this.setState({errors : error.response.data.validationErrors});
             }
         }
         this.setState({pendingApiCall:false});
@@ -52,7 +53,7 @@ class UserSignupPage extends React.Component{
 
     render(){
         const {pendingApiCall, errors} = this.state;
-        const {usernameError} = errors;
+        const {username,displayName} = errors;
         
         return(
             <div className="container">
@@ -60,15 +61,10 @@ class UserSignupPage extends React.Component{
                     <div className="col-md-9">
                         <form>
                             <h1 className="text-center">Sign Up</h1>
-                            <div className="form-group">
-                                <label>Username: </label>
-                                <input className={usernameError ? "form-control is-invalid": "form-control"} name="username" onChange = {this.onChange}/>
-                                <div className="invalid-feedback">{usernameError}</div>
-                            </div>
-                            <div className="form-group">
-                                <label>Displaye Name: </label>
-                                <input className="form-control" name="displayName" onChange = {this.onChange}/>
-                            </div>
+                            <Input name="username" label="Username" error={username} onChange = {this.onChange}></Input>
+
+                            <Input name="displayName" label="Displaye Name" error={displayName} onChange = {this.onChange}></Input>
+                            
                             <div className="form-group"> 
                                 <label>Password: </label>
                                 <input className="form-control" name="password" type="password" onChange = {this.onChange}/>
