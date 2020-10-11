@@ -8,11 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,21 +23,28 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user)
+    public ResponseEntity<?> createUser(@RequestBody User user)
     {
-        return ResponseEntity.ok(userService.save(user));
-    }
+        String username = user.getUsername();
+        String displayName = user.getDisplayName();
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleValidationException(MethodArgumentNotValidException exception){
         ApiError apiError = new ApiError(400,"Validation Error", "/api/1.0/users");
         Map<String,String> validationErros = new HashMap<>();
-        for(FieldError fieldError : exception.getBindingResult().getFieldErrors()){
-            validationErros.put(fieldError.getField(), fieldError.getDefaultMessage());
+        if(username == null || username.isEmpty()){
+
+            validationErros.put("username", "Username cannot be null");
         }
 
-        apiError.setValidationErrors(validationErros);
-        return apiError;
+        if(displayName == null || displayName.isEmpty()){
+
+            validationErros.put("displayName", "Display name cannot be null");
+        }
+
+        if(validationErros.size()>0){
+            apiError.setValidationErrors(validationErros);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        }
+
+        return ResponseEntity.ok(userService.save(user));
     }
 }
