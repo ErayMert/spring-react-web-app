@@ -1,6 +1,7 @@
 import React from 'react';
-import {signup} from '../api/apiCalls';
+import {signup, changeLanguage} from '../api/apiCalls';
 import Input from '../components/input';
+import {withTranslation} from 'react-i18next';
 
 class UserSignupPage extends React.Component{
 
@@ -17,12 +18,13 @@ class UserSignupPage extends React.Component{
         const {name, value} = event.target;
         const errors = { ... this.state.errors };
         errors[name] = undefined;
+        const { t } = this.props;
         
         if(name === 'password' || name === 'passwordRepeat'){
             if(name === 'password' && value !== this.state.passwordRepeat){
-                errors.passwordRepeat = 'Password mismacth!!'
+                errors.passwordRepeat = t('Password mismatch');
             }else if(name === 'passwordRepeat' && value !== this.state.password){
-                errors.password = 'Password mismacth!!'
+                errors.password = t('Password mismatch')
             }else {
                 errors.passwordRepeat = undefined;
             }
@@ -61,29 +63,48 @@ class UserSignupPage extends React.Component{
 
     };
 
+    onChangeLanguage = language =>{
+        const {i18n} = this.props;
+
+        i18n.changeLanguage(language);
+        changeLanguage(language);
+    }
+
     render(){
         const {pendingApiCall, errors} = this.state;
         const {username,displayName,password,passwordRepeat} = errors;
-        
+        const {t} = this.props;
         return(
             <div className="container">
                 <div className="row">
                     <div className="col-md-9">
                         <form>
-                            <h1 className="text-center">Sign Up</h1>
-                            <Input name="username" label="Username" error={username} onChange = {this.onChange}></Input>
+                            <h1 className="text-center">{t('Sign Up')}</h1>
+                            <Input name="username" label={t("Username")} error={username} onChange = {this.onChange}></Input>
 
-                            <Input name="displayName" label="Displaye Name" error={displayName} onChange = {this.onChange}></Input>
+                            <Input name="displayName" label={t("Display Name")} error={displayName} onChange = {this.onChange}></Input>
                             
-                            <Input name="password" label="Password" error={password} onChange = {this.onChange} type="password"></Input>
+                            <Input name="password" label= {t("Password")} error={password} onChange = {this.onChange} type="password"></Input>
 
-                            <Input name="passwordRepeat" label="Password Repeat" error={passwordRepeat} onChange = {this.onChange} type="password"></Input>
+                            <Input name="passwordRepeat" label= {t("Password Repeat")} error={passwordRepeat} onChange = {this.onChange} type="password"></Input>
+                            <div className = 'text-center'>
+                                <button className="btn btn-primary "
+                                onClick = {this.onClickSignUp}
+                                disabled={pendingApiCall || passwordRepeat !== undefined}>
+                                    {pendingApiCall && <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>} {t('Sign Up')}</button>
+                            </div>
+                            <div>
+                                <img className="mr-1" src={window.location.origin + '/turkey.png'} 
+                                alt = "Turkish"
+                                onClick ={() => this.onChangeLanguage('tr')} 
+                                style={{curser: 'pointer'}} width = "30" height= "30" >
 
-                            <button className="btn btn-primary"
-                            onClick = {this.onClickSignUp}
-                            disabled={pendingApiCall || passwordRepeat !== undefined}>
-                                {pendingApiCall && <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>} Sign Up</button>
-                            
+                                </img>
+                                <img src={window.location.origin + '/united-states.png'}  
+                                alt = "USA" 
+                                onClick ={() => this.onChangeLanguage('en')} 
+                                style={{curser: 'pointer'}} width = "30" height= "30"></img>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -93,4 +114,6 @@ class UserSignupPage extends React.Component{
     }
 }
 
-export default UserSignupPage;
+const UserSignUpTranslation = withTranslation()(UserSignupPage);
+
+export default UserSignUpTranslation;
