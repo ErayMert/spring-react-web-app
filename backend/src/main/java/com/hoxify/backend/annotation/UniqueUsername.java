@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 )
 public @interface UniqueUsername {
 
-    String message() default "Username must be unique";
+    String message() default "{hoxify.constraint.username.UniqueUsername.message}";
 
     Class<?>[] groups() default {};
 
